@@ -100,12 +100,12 @@ export default function HomePage() {
               <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity blur" />
             </Link>
 
-            <Link
-              href="/driver"
+            <a
+              href="http://localhost:3009"
               className="px-8 py-4 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl font-semibold text-lg hover:bg-white/10 transition-all duration-300 hover:scale-105"
             >
               Driver App →
-            </Link>
+            </a>
           </motion.div>
         </motion.div>
 
