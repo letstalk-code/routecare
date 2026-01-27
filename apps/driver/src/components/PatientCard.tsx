@@ -1,6 +1,6 @@
 'use client';
 
-import { Passenger } from '@routecare/shared';
+import { Passenger } from '@/shared';
 
 interface PatientCardProps {
   passenger: Passenger;

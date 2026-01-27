@@ -1,6 +1,6 @@
 'use client';
 
-import { mockData } from '@routecare/shared';
+import { mockData } from '@/shared';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import {

@@ -1,6 +1,6 @@
 'use client';
 
-import { mockData } from '@routecare/shared';
+import { mockData } from '@/shared';
 import { useState } from 'react';
 import {
   PatientInfoCard,

@@ -1,6 +1,6 @@
 'use client';
 
-import { Trip } from '@routecare/shared';
+import { Trip } from '@/shared';
 
 interface TripRequirementsCardProps {
   trip: Trip;

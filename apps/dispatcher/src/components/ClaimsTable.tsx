@@ -1,6 +1,6 @@
 'use client';
 
-import { Claim } from '@routecare/shared';
+import { Claim } from '@/shared';
 import { motion } from 'framer-motion';
 
 interface ClaimsTableProps {

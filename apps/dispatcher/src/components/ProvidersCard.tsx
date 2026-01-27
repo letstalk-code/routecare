@@ -1,6 +1,6 @@
 'use client';
 
-import { TransportationProvider } from '@routecare/shared';
+import { TransportationProvider } from '@/shared';
 import { motion } from 'framer-motion';
 
 interface ProvidersCardProps {

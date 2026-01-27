@@ -1,6 +1,6 @@
 'use client';
 
-import { TripEvent } from '@routecare/shared';
+import { TripEvent } from '@/shared';
 import { motion } from 'framer-motion';
 
 interface RecentActivityCardProps {

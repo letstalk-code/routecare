@@ -1,6 +1,6 @@
 'use client';
 
-import { BillingStats } from '@routecare/shared';
+import { BillingStats } from '@/shared';
 import { motion } from 'framer-motion';
 
 interface BillingStatsCardProps {

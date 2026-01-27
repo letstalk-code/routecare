@@ -1,6 +1,6 @@
 'use client';
 
-import { Passenger } from '@routecare/shared';
+import { Passenger } from '@/shared';
 import { motion } from 'framer-motion';
 
 interface PatientInfoCardProps {

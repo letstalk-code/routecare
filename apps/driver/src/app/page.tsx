@@ -1,6 +1,6 @@
 'use client';
 
-import { mockData, Trip, TripEvent } from '@routecare/shared';
+import { mockData, Trip, TripEvent } from '@/shared';
 import { useState } from 'react';
 import { TripRequirementsCard } from '@/components/TripRequirementsCard';
 import { PatientCard } from '@/components/PatientCard';

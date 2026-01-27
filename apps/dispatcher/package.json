@@ -10,7 +10,6 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@routecare/shared": "*",
     "framer-motion": "^12.29.2",
     "next": "16.1.5",
     "react": "19.2.3",

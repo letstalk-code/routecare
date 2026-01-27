@@ -3,7 +3,7 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { mockData } from '@routecare/shared';
+import { mockData } from '@/shared';
 
 export default function HomePage() {
   const [mounted, setMounted] = useState(false);

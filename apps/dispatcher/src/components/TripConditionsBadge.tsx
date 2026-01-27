@@ -1,6 +1,6 @@
 'use client';
 
-import { MobilityLevel } from '@routecare/shared';
+import { MobilityLevel } from '@/shared';
 
 interface TripConditionsBadgeProps {
   mobilityLevel: MobilityLevel;
