@@ -129,11 +129,9 @@ export function AddDriverModal({ isOpen, onClose, onSuccess }: AddDriverModalPro
             className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
           >
             <option value="">Select zone</option>
-            <option value="North">North</option>
-            <option value="South">South</option>
-            <option value="East">East</option>
-            <option value="West">West</option>
-            <option value="Central">Central</option>
+            <option value="Tampa">Tampa</option>
+            <option value="St. Petersburg">St. Petersburg</option>
+            <option value="New Port Richey">New Port Richey</option>
           </select>
         </div>
 

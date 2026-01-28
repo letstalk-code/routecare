@@ -6,3 +6,4 @@ export { TripConditionsBadge } from './TripConditionsBadge';
 export { RecentActivityCard } from './RecentActivityCard';
 export { Modal } from './Modal';
 export { AddDriverModal } from './AddDriverModal';
+export { AddVehicleModal } from './AddVehicleModal';

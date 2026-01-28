@@ -9,6 +9,7 @@ import {
   ClaimsTable,
   RecentActivityCard,
   AddDriverModal,
+  AddVehicleModal,
 } from '@/components';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
@@ -23,6 +24,7 @@ export default function DashboardPage() {
   const [trips, setTrips] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddDriverModal, setShowAddDriverModal] = useState(false);
+  const [showAddVehicleModal, setShowAddVehicleModal] = useState(false);
 
   // Load data from API
   const loadData = async () => {
@@ -234,6 +236,12 @@ export default function DashboardPage() {
             </div>
             <div className="flex items-center gap-3">
               <button
+                onClick={() => setShowAddVehicleModal(true)}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors text-sm"
+              >
+                + Add Vehicle
+              </button>
+              <button
                 onClick={() => setShowAddDriverModal(true)}
                 className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-colors text-sm"
               >
@@ -377,7 +385,15 @@ export default function DashboardPage() {
         isOpen={showAddDriverModal}
         onClose={() => setShowAddDriverModal(false)}
         onSuccess={() => {
-          // Reload data after successfully adding a driver
+          loadData();
+        }}
+      />
+
+      {/* Add Vehicle Modal */}
+      <AddVehicleModal
+        isOpen={showAddVehicleModal}
+        onClose={() => setShowAddVehicleModal(false)}
+        onSuccess={() => {
           loadData();
         }}
       />
