@@ -22,7 +22,7 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-slate-950">
       {/* Header */}
-      <header className="border-b border-white/10 bg-slate-900/50 backdrop-blur-sm sticky top-0 z-50">
+      <header className="border-b border-purple-900/30 bg-slate-900/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="px-6 py-4 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-white">

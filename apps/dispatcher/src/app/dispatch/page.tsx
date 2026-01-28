@@ -27,7 +27,7 @@ export default function DispatchPage() {
   return (
     <div className="min-h-screen bg-slate-950 text-white">
       {/* Header */}
-      <header className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-sm">
+      <header className="border-b border-purple-900/30 bg-slate-900/50 backdrop-blur-sm">
         <div className="px-4 lg:px-6 py-4">
           <h1 className="text-xl lg:text-2xl font-bold">RouteCare — Dispatch & Fleet Tracking</h1>
         </div>

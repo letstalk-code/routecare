@@ -4,11 +4,17 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "RouteCare - NEMT Dispatch & Fleet Tracking",
   description: "Real-time fleet tracking, intelligent dispatch, and seamless coordination for medical transportation excellence",
-  themeColor: "#0f172a", // slate-900 - matches app dark theme
+  themeColor: "#4c1d95", // purple-900 - dark purple theme
+  manifest: "/manifest.json",
   viewport: {
     width: "device-width",
     initialScale: 1,
     maximumScale: 1,
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "RouteCare",
   },
 };
 
