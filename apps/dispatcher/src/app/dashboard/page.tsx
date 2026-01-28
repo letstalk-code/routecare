@@ -19,6 +19,20 @@ export default function DashboardPage() {
     { label: 'Active Drivers', value: kpis.activeDrivers, icon: '👥', color: 'from-purple-500 to-pink-500' },
   ];
 
+  // Items that need immediate attention
+  const needsAttention = trips
+    .filter((trip) => trip.priority === 'STAT' || trip.status === 'unassigned')
+    .slice(0, 5)
+    .map((trip) => ({
+      id: trip.id,
+      title: `${trip.passenger.name} - ${trip.type === 'discharge' ? 'Discharge' : 'Scheduled'}`,
+      subtitle: `${trip.pickup.address} → ${trip.dropoff.address}`,
+      reason: trip.priority === 'STAT' ? 'STAT Priority' : 'Unassigned',
+      urgent: trip.priority === 'STAT',
+      action: 'Assign Driver',
+      tripId: trip.id,
+    }));
+
   return (
     <div className="min-h-screen bg-slate-950">
       {/* Header */}
@@ -66,6 +80,74 @@ export default function DashboardPage() {
           ))}
         </div>
 
+        {/* Needs Attention Section */}
+        {needsAttention.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="glass-panel rounded-xl p-6 border-l-4 border-red-500"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-red-500/20 flex items-center justify-center text-xl">
+                  ⚠️
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-white">Needs Attention</h2>
+                  <p className="text-sm text-slate-400">{needsAttention.length} items require action</p>
+                </div>
+              </div>
+              <Link
+                href="/dispatch"
+                className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg text-sm font-medium transition-colors"
+              >
+                Open Dispatch
+              </Link>
+            </div>
+            <div className="space-y-2">
+              {needsAttention.map((item, index) => (
+                <motion.div
+                  key={item.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.5 + index * 0.05 }}
+                  className="p-4 rounded-lg bg-slate-800/30 border border-white/5 hover:border-red-500/30 transition-colors"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="font-medium text-white truncate">{item.title}</h3>
+                        {item.urgent && (
+                          <span className="px-2 py-0.5 bg-red-500/20 text-red-400 text-xs rounded whitespace-nowrap">
+                            STAT
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm text-slate-400 truncate mb-2">{item.subtitle}</p>
+                      <div className="flex items-center gap-2">
+                        <span className={`px-2 py-0.5 text-xs rounded ${
+                          item.urgent
+                            ? 'bg-red-500/20 text-red-400'
+                            : 'bg-yellow-500/20 text-yellow-400'
+                        }`}>
+                          {item.reason}
+                        </span>
+                      </div>
+                    </div>
+                    <Link
+                      href="/dispatch"
+                      className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm rounded transition-colors whitespace-nowrap"
+                    >
+                      {item.action}
+                    </Link>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Activity + Billing */}
@@ -80,7 +162,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Quick Fleet Overview */}
+        {/* Quick Fleet Overview - Enhanced Table */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -88,25 +170,106 @@ export default function DashboardPage() {
           className="glass-panel rounded-xl p-6"
         >
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold">Fleet Status</h2>
+            <div>
+              <h2 className="text-xl font-semibold text-white">Fleet Status</h2>
+              <p className="text-sm text-slate-400 mt-1">Real-time driver activity and performance</p>
+            </div>
             <Link href="/dispatch" className="text-indigo-400 hover:text-indigo-300 text-sm font-medium">
               View Full Map →
             </Link>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+
+          {/* Desktop Table View */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-white/10">
+                  <th className="text-left py-3 px-4 text-sm font-medium text-slate-400">Driver</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-slate-400">Status</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-slate-400">Current Trip</th>
+                  <th className="text-center py-3 px-4 text-sm font-medium text-slate-400">Today</th>
+                  <th className="text-center py-3 px-4 text-sm font-medium text-slate-400">On-Time</th>
+                  <th className="text-center py-3 px-4 text-sm font-medium text-slate-400">Miles</th>
+                </tr>
+              </thead>
+              <tbody>
+                {drivers.map((driver, index) => {
+                  const currentTrip = trips.find(t => t.assignedDriver === driver.id && t.status === 'on_trip');
+                  return (
+                    <motion.tr
+                      key={driver.id}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.4 + index * 0.05 }}
+                      className="border-b border-white/5 hover:bg-slate-800/30 transition-colors"
+                    >
+                      <td className="py-4 px-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center font-bold text-sm">
+                            {driver.initials}
+                          </div>
+                          <div>
+                            <div className="font-medium text-white">{driver.name}</div>
+                            <div className="text-xs text-slate-400">{driver.zone} Zone</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="flex items-center gap-2">
+                          <div className={`w-2.5 h-2.5 rounded-full ${
+                            driver.status === 'available' ? 'bg-emerald-500 animate-pulse' :
+                            driver.status === 'on_trip' ? 'bg-blue-500' :
+                            driver.status === 'break' ? 'bg-yellow-500' : 'bg-slate-500'
+                          }`} />
+                          <span className="text-sm text-slate-300 capitalize">{driver.status.replace('_', ' ')}</span>
+                        </div>
+                      </td>
+                      <td className="py-4 px-4">
+                        {currentTrip ? (
+                          <div className="text-sm">
+                            <div className="text-white truncate max-w-xs">{currentTrip.passenger.name}</div>
+                            <div className="text-xs text-slate-400 truncate">{currentTrip.dropoff.address.split(',')[0]}</div>
+                          </div>
+                        ) : (
+                          <span className="text-sm text-slate-500">—</span>
+                        )}
+                      </td>
+                      <td className="py-4 px-4 text-center">
+                        <span className="text-lg font-bold text-white">{driver.stats.tripsToday}</span>
+                      </td>
+                      <td className="py-4 px-4 text-center">
+                        <span className={`text-lg font-bold ${
+                          driver.stats.onTimeRate >= 90 ? 'text-emerald-400' :
+                          driver.stats.onTimeRate >= 75 ? 'text-yellow-400' : 'text-red-400'
+                        }`}>
+                          {driver.stats.onTimeRate}%
+                        </span>
+                      </td>
+                      <td className="py-4 px-4 text-center">
+                        <span className="text-lg font-bold text-white">{driver.stats.totalMiles}</span>
+                      </td>
+                    </motion.tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile Card View */}
+          <div className="md:hidden space-y-3">
             {drivers.map((driver, index) => (
               <motion.div
                 key={driver.id}
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.4 + index * 0.05 }}
-                className="p-4 rounded-lg bg-slate-800/30 border border-white/5 hover:border-indigo-500/30 transition-colors"
+                className="p-4 rounded-lg bg-slate-800/30 border border-white/5"
               >
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center font-bold text-sm">
                     {driver.initials}
                   </div>
-                  <div>
+                  <div className="flex-1">
                     <div className="font-medium text-sm text-white">{driver.name}</div>
                     <div className="flex items-center gap-1.5 mt-0.5">
                       <div className={`w-2 h-2 rounded-full ${
@@ -124,7 +287,12 @@ export default function DashboardPage() {
                     <div className="text-xs text-slate-400">Trips</div>
                   </div>
                   <div>
-                    <div className="text-lg font-bold text-white">{driver.stats.onTimeRate}%</div>
+                    <div className={`text-lg font-bold ${
+                      driver.stats.onTimeRate >= 90 ? 'text-emerald-400' :
+                      driver.stats.onTimeRate >= 75 ? 'text-yellow-400' : 'text-red-400'
+                    }`}>
+                      {driver.stats.onTimeRate}%
+                    </div>
                     <div className="text-xs text-slate-400">On-Time</div>
                   </div>
                   <div>

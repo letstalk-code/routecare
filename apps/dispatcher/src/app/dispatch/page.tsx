@@ -11,16 +11,30 @@ import {
 } from '@/components';
 
 export default function DispatchPage() {
-  const [selectedTab, setSelectedTab] = useState<'discharge' | 'scheduled' | 'all'>('discharge');
+  const [selectedTab, setSelectedTab] = useState<'needs_action' | 'discharge' | 'scheduled' | 'all'>('needs_action');
   const [selectedTrip, setSelectedTrip] = useState<string | null>(null);
 
   const { trips, drivers, kpis, driverSuggestions, claims, billingStats, transportationProviders } = mockData;
 
-  const filteredTrips = trips.filter((trip) => {
-    if (selectedTab === 'discharge') return trip.type === 'discharge';
-    if (selectedTab === 'scheduled') return trip.priority === 'scheduled';
-    return true;
-  });
+  const filteredTrips = trips
+    .filter((trip) => {
+      if (selectedTab === 'needs_action') {
+        // Show STAT, unassigned, or high priority trips that need immediate action
+        return trip.priority === 'STAT' || trip.status === 'unassigned';
+      }
+      if (selectedTab === 'discharge') return trip.type === 'discharge';
+      if (selectedTab === 'scheduled') return trip.priority === 'scheduled';
+      return true;
+    })
+    .sort((a, b) => {
+      // Always pin STAT trips to the top
+      if (a.priority === 'STAT' && b.priority !== 'STAT') return -1;
+      if (b.priority === 'STAT' && a.priority !== 'STAT') return 1;
+      // Then unassigned trips
+      if (a.status === 'unassigned' && b.status !== 'unassigned') return -1;
+      if (b.status === 'unassigned' && a.status !== 'unassigned') return 1;
+      return 0;
+    });
 
   const selectedTripData = trips.find((t) => t.id === selectedTrip);
 
@@ -48,7 +62,14 @@ export default function DispatchPage() {
           <h2 className="text-lg font-semibold mb-4">Dispatch Queue</h2>
 
           {/* Tabs */}
-          <div className="flex gap-2 mb-4">
+          <div className="flex gap-2 mb-4 overflow-x-auto">
+            <TabButton
+              active={selectedTab === 'needs_action'}
+              onClick={() => setSelectedTab('needs_action')}
+              label="Needs Action"
+              count={trips.filter((t) => t.priority === 'STAT' || t.status === 'unassigned').length}
+              alert
+            />
             <TabButton
               active={selectedTab === 'discharge'}
               onClick={() => setSelectedTab('discharge')}
@@ -78,6 +99,8 @@ export default function DispatchPage() {
                 className={`p-3 rounded-lg cursor-pointer transition ${
                   selectedTrip === trip.id
                     ? 'bg-indigo-600/30 border border-indigo-500'
+                    : trip.priority === 'STAT'
+                    ? 'bg-red-900/20 hover:bg-red-900/30 border border-red-500/40 ring-1 ring-red-500/20'
                     : 'bg-slate-800/50 hover:bg-slate-800'
                 }`}
               >
@@ -189,23 +212,61 @@ export default function DispatchPage() {
                 )}
                 {selectedTripData.status === 'unassigned' && (
                   <div>
-                    <div className="text-sm text-slate-400 mb-2">Suggested Drivers</div>
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="text-sm font-semibold text-slate-300">Recommended Drivers</div>
+                      {driverSuggestions.find((ds) => ds.tripId === selectedTripData.id)?.suggestions[0] && (
+                        <button
+                          onClick={() => {
+                            const topDriver = driverSuggestions.find((ds) => ds.tripId === selectedTripData.id)?.suggestions[0];
+                            const driver = drivers.find((d) => d.id === topDriver?.driverId);
+                            alert(`Assigning ${driver?.name} to trip ${selectedTripData.id} (UI only - no backend)`);
+                          }}
+                          className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded transition"
+                        >
+                          Assign Top Match
+                        </button>
+                      )}
+                    </div>
                     {driverSuggestions
                       .find((ds) => ds.tripId === selectedTripData.id)
-                      ?.suggestions.slice(0, 2)
-                      .map((suggestion) => {
+                      ?.suggestions.slice(0, 3)
+                      .map((suggestion, idx) => {
                         const driver = drivers.find((d) => d.id === suggestion.driverId);
                         return (
-                          <div key={suggestion.driverId} className="p-3 bg-slate-800/50 hover:bg-slate-800 rounded mb-2 cursor-pointer transition">
+                          <div
+                            key={suggestion.driverId}
+                            className={`p-3 rounded mb-2 transition ${
+                              idx === 0
+                                ? 'bg-emerald-900/20 border border-emerald-500/30 ring-1 ring-emerald-500/20'
+                                : 'bg-slate-800/50 hover:bg-slate-800'
+                            }`}
+                          >
                             <div className="flex items-center justify-between mb-1">
-                              <div className="font-medium">{driver?.name}</div>
-                              <div className="text-xs font-semibold text-indigo-400">Score: {suggestion.score}</div>
+                              <div className="flex items-center gap-2">
+                                {idx === 0 && <span className="text-emerald-400 text-xs">★</span>}
+                                <div className="font-medium text-sm">{driver?.name}</div>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <div className="text-xs font-semibold text-indigo-400">Score: {suggestion.score}</div>
+                                <button
+                                  onClick={() => {
+                                    alert(`Assigning ${driver?.name} to trip ${selectedTripData.id} (UI only)`);
+                                  }}
+                                  className="px-2 py-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs rounded transition"
+                                >
+                                  Assign
+                                </button>
+                              </div>
                             </div>
-                            <div className="text-xs text-slate-400">
-                              {suggestion.distance} mi away • {driver?.zone} zone
+                            <div className="text-xs text-slate-400 mb-1">
+                              {suggestion.distance} mi away • {driver?.zone} zone • {driver?.status}
                             </div>
-                            <div className="mt-1 text-xs text-emerald-400">
-                              {suggestion.reasons[0]}
+                            <div className="flex flex-wrap gap-1">
+                              {suggestion.reasons.map((reason, i) => (
+                                <span key={i} className="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded">
+                                  {reason}
+                                </span>
+                              ))}
                             </div>
                           </div>
                         );
@@ -237,18 +298,24 @@ function TabButton({
   onClick,
   label,
   count,
+  alert,
 }: {
   active: boolean;
   onClick: () => void;
   label: string;
   count: number;
+  alert?: boolean;
 }) {
   return (
     <button
       onClick={onClick}
-      className={`px-3 py-1.5 rounded text-sm transition ${
+      className={`px-3 py-1.5 rounded text-sm transition whitespace-nowrap ${
         active
-          ? 'bg-indigo-600 text-white'
+          ? alert
+            ? 'bg-red-600 text-white ring-2 ring-red-400/50'
+            : 'bg-indigo-600 text-white'
+          : alert && count > 0
+          ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30 ring-1 ring-red-500/50'
           : 'bg-slate-800/50 text-slate-400 hover:bg-slate-800'
       }`}
     >
