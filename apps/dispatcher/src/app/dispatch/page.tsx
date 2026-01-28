@@ -44,7 +44,7 @@ export default function DispatchPage() {
 
       <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 p-4 lg:p-6 lg:h-[calc(100vh-200px)]">
         {/* Dispatch Queue - Shows first on mobile, side on desktop */}
-        <div className="w-full lg:w-[450px] glass-panel rounded-lg p-4 lg:p-6 flex flex-col max-h-[600px] lg:max-h-none">
+        <div className={`w-full lg:w-[450px] glass-panel rounded-lg p-4 lg:p-6 flex flex-col max-h-[600px] lg:max-h-none ${selectedTripData ? 'hidden lg:flex' : ''}`}>
           <h2 className="text-lg font-semibold mb-4">Dispatch Queue</h2>
 
           {/* Tabs */}
@@ -118,7 +118,7 @@ export default function DispatchPage() {
         </div>
 
         {/* Map Panel - Shows second on mobile, first on desktop */}
-        <div className="flex-1 glass-panel rounded-lg p-4 lg:p-6 min-h-[400px] lg:min-h-0">
+        <div className={`flex-1 glass-panel rounded-lg p-4 lg:p-6 min-h-[400px] lg:min-h-0 ${selectedTripData ? 'hidden lg:flex' : ''}`}>
           <h2 className="text-lg font-semibold mb-4">Fleet Map</h2>
           <div className="relative w-full h-full bg-slate-800/30 rounded-lg flex items-center justify-center">
             <div className="text-center">
@@ -139,15 +139,15 @@ export default function DispatchPage() {
           </div>
         </div>
 
-        {/* Trip Detail Slide-over */}
+        {/* Trip Detail Panel - Full screen on mobile, sidebar on desktop */}
         {selectedTripData && (
-          <div className="w-full lg:w-96 flex flex-col gap-4 overflow-y-auto max-h-full">
-            <div className="glass-panel rounded-lg p-6">
+          <div className="w-full lg:w-96 flex flex-col gap-4 overflow-y-auto">
+            <div className="glass-panel rounded-lg p-4 lg:p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold">Trip Details</h2>
                 <button
                   onClick={() => setSelectedTrip(null)}
-                  className="text-slate-400 hover:text-white"
+                  className="text-slate-400 hover:text-white text-xl"
                 >
                   ✕
                 </button>
