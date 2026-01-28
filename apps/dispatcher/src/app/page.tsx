@@ -18,6 +18,11 @@ export default function HomePage() {
 
   const { tripsToday, activeDrivers, onTimeRateScheduled } = mockData.kpis;
 
+  // Driver app URL based on environment
+  const driverAppUrl = typeof window !== 'undefined' && window.location.hostname === 'localhost'
+    ? 'http://localhost:3009'
+    : 'https://routecare-driver.vercel.app';
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 text-white overflow-x-hidden">
       {/* Animated background gradient */}
@@ -101,7 +106,7 @@ export default function HomePage() {
             </Link>
 
             <a
-              href="http://localhost:3009"
+              href={driverAppUrl}
               className="px-8 py-4 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl font-semibold text-lg hover:bg-white/10 transition-all duration-300 hover:scale-105"
             >
               Driver App →

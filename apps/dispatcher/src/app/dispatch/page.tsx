@@ -28,13 +28,13 @@ export default function DispatchPage() {
     <div className="min-h-screen bg-slate-950 text-white">
       {/* Header */}
       <header className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-sm">
-        <div className="px-6 py-4">
-          <h1 className="text-2xl font-bold">RouteCare — Dispatch & Fleet Tracking</h1>
+        <div className="px-4 lg:px-6 py-4">
+          <h1 className="text-xl lg:text-2xl font-bold">RouteCare — Dispatch & Fleet Tracking</h1>
         </div>
       </header>
 
       {/* KPI Cards */}
-      <div className="px-6 py-4 grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div className="px-4 lg:px-6 py-4 grid grid-cols-2 md:grid-cols-5 gap-3 lg:gap-4">
         <KpiCard label="Trips Today" value={kpis.tripsToday} />
         <KpiCard label="STAT Pending" value={kpis.dischargePendingStat} alert />
         <KpiCard label="On-Time Rate" value={`${kpis.onTimeRateScheduled}%`} />
@@ -42,31 +42,9 @@ export default function DispatchPage() {
         <KpiCard label="Available" value={kpis.availableDrivers} />
       </div>
 
-      <div className="flex gap-6 p-6 h-[calc(100vh-200px)]">
-        {/* Map Panel */}
-        <div className="flex-1 glass-panel rounded-lg p-6">
-          <h2 className="text-lg font-semibold mb-4">Fleet Map</h2>
-          <div className="relative w-full h-full bg-slate-800/30 rounded-lg flex items-center justify-center">
-            <div className="text-center">
-              <div className="text-4xl mb-2">🗺️</div>
-              <p className="text-slate-400">Live GPS tracking visualization</p>
-              <div className="mt-4 space-y-2">
-                {drivers.map((driver) => (
-                  <div key={driver.id} className="flex items-center gap-2 justify-center">
-                    <div className={`w-3 h-3 rounded-full ${
-                      driver.status === 'available' ? 'bg-green-500' :
-                      driver.status === 'on_trip' ? 'bg-blue-500' : 'bg-gray-500'
-                    }`} />
-                    <span className="text-sm">{driver.initials} - {driver.status}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Dispatch Queue */}
-        <div className="w-96 glass-panel rounded-lg p-6 flex flex-col">
+      <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 p-4 lg:p-6 lg:h-[calc(100vh-200px)]">
+        {/* Dispatch Queue - Shows first on mobile, side on desktop */}
+        <div className="w-full lg:w-96 glass-panel rounded-lg p-4 lg:p-6 flex flex-col max-h-[600px] lg:max-h-none">
           <h2 className="text-lg font-semibold mb-4">Dispatch Queue</h2>
 
           {/* Tabs */}
@@ -139,9 +117,31 @@ export default function DispatchPage() {
           </div>
         </div>
 
+        {/* Map Panel - Shows second on mobile, first on desktop */}
+        <div className="flex-1 glass-panel rounded-lg p-4 lg:p-6 min-h-[400px] lg:min-h-0">
+          <h2 className="text-lg font-semibold mb-4">Fleet Map</h2>
+          <div className="relative w-full h-full bg-slate-800/30 rounded-lg flex items-center justify-center">
+            <div className="text-center">
+              <div className="text-4xl mb-2">🗺️</div>
+              <p className="text-slate-400">Live GPS tracking visualization</p>
+              <div className="mt-4 space-y-2">
+                {drivers.map((driver) => (
+                  <div key={driver.id} className="flex items-center gap-2 justify-center">
+                    <div className={`w-3 h-3 rounded-full ${
+                      driver.status === 'available' ? 'bg-green-500' :
+                      driver.status === 'on_trip' ? 'bg-blue-500' : 'bg-gray-500'
+                    }`} />
+                    <span className="text-sm">{driver.initials} - {driver.status}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Trip Detail Slide-over */}
         {selectedTripData && (
-          <div className="w-96 flex flex-col gap-4 overflow-y-auto max-h-full">
+          <div className="w-full lg:w-96 flex flex-col gap-4 overflow-y-auto max-h-full">
             <div className="glass-panel rounded-lg p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold">Trip Details</h2>
