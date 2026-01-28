@@ -9,3 +9,4 @@ export { AddDriverModal } from './AddDriverModal';
 export { AddVehicleModal } from './AddVehicleModal';
 export { AddTripModal } from './AddTripModal';
 export { AddPassengerModal } from './AddPassengerModal';
+export { AssignDriverModal } from './AssignDriverModal';

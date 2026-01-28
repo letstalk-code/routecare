@@ -11,6 +11,7 @@ import {
   AddDriverModal,
   AddVehicleModal,
   AddPassengerModal,
+  AssignDriverModal,
 } from '@/components';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
@@ -27,6 +28,8 @@ export default function DashboardPage() {
   const [showAddDriverModal, setShowAddDriverModal] = useState(false);
   const [showAddVehicleModal, setShowAddVehicleModal] = useState(false);
   const [showAddPassengerModal, setShowAddPassengerModal] = useState(false);
+  const [showAssignDriverModal, setShowAssignDriverModal] = useState(false);
+  const [selectedTripId, setSelectedTripId] = useState<string>('');
 
   // Load data from API
   const loadData = async () => {
@@ -228,12 +231,15 @@ export default function DashboardPage() {
                         </span>
                       </div>
                     </div>
-                    <Link
-                      href="/dispatch"
+                    <button
+                      onClick={() => {
+                        setSelectedTripId(item.tripId);
+                        setShowAssignDriverModal(true);
+                      }}
                       className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm rounded transition-colors whitespace-nowrap"
                     >
                       {item.action}
-                    </Link>
+                    </button>
                   </div>
                 </motion.div>
               ))}
@@ -424,6 +430,16 @@ export default function DashboardPage() {
         onSuccess={() => {
           loadData();
         }}
+      />
+
+      {/* Assign Driver Modal */}
+      <AssignDriverModal
+        isOpen={showAssignDriverModal}
+        onClose={() => setShowAssignDriverModal(false)}
+        onSuccess={() => {
+          loadData();
+        }}
+        tripId={selectedTripId}
       />
     </div>
   );
