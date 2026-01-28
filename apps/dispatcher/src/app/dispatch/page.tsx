@@ -9,6 +9,7 @@ import {
   ClaimsTable,
   ProvidersCard,
   TripConditionsBadge,
+  AddTripModal,
 } from '@/components';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
@@ -25,25 +26,27 @@ export default function DispatchPage() {
     availableDrivers: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [showAddTripModal, setShowAddTripModal] = useState(false);
 
   // Load data from API
-  useEffect(() => {
-    async function loadData() {
-      try {
-        const [tripsData, driversData, kpisData] = await Promise.all([
-          api.trips.getAll(),
-          api.drivers.getAll(),
-          api.dashboard.getKpis(),
-        ]);
-        setTrips(tripsData.trips);
-        setDrivers(driversData.drivers);
-        setKpis(kpisData.kpis);
-      } catch (error) {
-        console.error('Failed to load data:', error);
-      } finally {
-        setLoading(false);
-      }
+  const loadData = async () => {
+    try {
+      const [tripsData, driversData, kpisData] = await Promise.all([
+        api.trips.getAll(),
+        api.drivers.getAll(),
+        api.dashboard.getKpis(),
+      ]);
+      setTrips(tripsData.trips);
+      setDrivers(driversData.drivers);
+      setKpis(kpisData.kpis);
+    } catch (error) {
+      console.error('Failed to load data:', error);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  useEffect(() => {
     loadData();
   }, []);
 
@@ -100,7 +103,15 @@ export default function DispatchPage() {
             </Link>
             <h1 className="text-xl lg:text-2xl font-bold">RouteCare — Dispatch & Fleet Tracking</h1>
           </div>
-          <ThemeToggle />
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowAddTripModal(true)}
+              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-colors text-sm"
+            >
+              + Create Trip
+            </button>
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 
@@ -337,6 +348,15 @@ export default function DispatchPage() {
           </div>
         )}
       </div>
+
+      {/* Add Trip Modal */}
+      <AddTripModal
+        isOpen={showAddTripModal}
+        onClose={() => setShowAddTripModal(false)}
+        onSuccess={() => {
+          loadData();
+        }}
+      />
     </div>
   );
 }

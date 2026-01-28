@@ -13,6 +13,7 @@ interface AddDriverModalProps {
 export function AddDriverModal({ isOpen, onClose, onSuccess }: AddDriverModalProps) {
   const [loading, setLoading] = useState(false);
   const [vehicles, setVehicles] = useState<any[]>([]);
+  const [zones, setZones] = useState<string[]>([]);
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -23,10 +24,18 @@ export function AddDriverModal({ isOpen, onClose, onSuccess }: AddDriverModalPro
     certifications: [] as string[],
   });
 
-  // Load vehicles
+  // Load vehicles and zones
   useEffect(() => {
     if (isOpen) {
       api.vehicles.getAll().then((data) => setVehicles(data.vehicles));
+
+      // Load zones from localStorage
+      const savedZones = localStorage.getItem('routecare_zones');
+      if (savedZones) {
+        setZones(JSON.parse(savedZones));
+      } else {
+        setZones(['Tampa', 'St. Petersburg', 'New Port Richey']);
+      }
     }
   }, [isOpen]);
 
@@ -129,9 +138,11 @@ export function AddDriverModal({ isOpen, onClose, onSuccess }: AddDriverModalPro
             className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
           >
             <option value="">Select zone</option>
-            <option value="Tampa">Tampa</option>
-            <option value="St. Petersburg">St. Petersburg</option>
-            <option value="New Port Richey">New Port Richey</option>
+            {zones.map((zone) => (
+              <option key={zone} value={zone}>
+                {zone}
+              </option>
+            ))}
           </select>
         </div>
 
