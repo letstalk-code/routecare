@@ -1,8 +1,8 @@
 'use client';
 
-import { mockData } from '@/shared';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { api } from '@/lib/api-client';
 import {
   PatientInfoCard,
   BillingStatsCard,
@@ -15,8 +15,40 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 export default function DispatchPage() {
   const [selectedTab, setSelectedTab] = useState<'needs_action' | 'discharge' | 'scheduled' | 'all'>('needs_action');
   const [selectedTrip, setSelectedTrip] = useState<string | null>(null);
+  const [trips, setTrips] = useState<any[]>([]);
+  const [drivers, setDrivers] = useState<any[]>([]);
+  const [kpis, setKpis] = useState<any>({
+    tripsToday: 0,
+    dischargePendingStat: 0,
+    onTimeRateScheduled: 0,
+    activeDrivers: 0,
+    availableDrivers: 0,
+  });
+  const [loading, setLoading] = useState(true);
 
-  const { trips, drivers, kpis, driverSuggestions, claims, billingStats, transportationProviders } = mockData;
+  // Load data from API
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [tripsData, driversData, kpisData] = await Promise.all([
+          api.trips.getAll(),
+          api.drivers.getAll(),
+          api.dashboard.getKpis(),
+        ]);
+        setTrips(tripsData.trips);
+        setDrivers(driversData.drivers);
+        setKpis(kpisData.kpis);
+      } catch (error) {
+        console.error('Failed to load data:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, []);
+
+  // Use mock data for driver suggestions (not yet implemented in API)
+  const driverSuggestions: any[] = [];
 
   const filteredTrips = trips
     .filter((trip) => {
@@ -39,6 +71,17 @@ export default function DispatchPage() {
     });
 
   const selectedTripData = trips.find((t) => t.id === selectedTrip);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-white transition-colors flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-4xl mb-4">⏳</div>
+          <p className="text-slate-600 dark:text-slate-400">Loading dispatch data...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-white transition-colors">
@@ -128,8 +171,8 @@ export default function DispatchPage() {
                   )}
                 </div>
                 <div className="text-sm text-slate-300 mb-2">
-                  <div className="truncate">📍 {trip.pickup.address}</div>
-                  <div className="truncate">🏥 {trip.dropoff.address}</div>
+                  <div className="truncate">📍 {trip.pickupAddress}</div>
+                  <div className="truncate">🏥 {trip.dropoffAddress}</div>
                 </div>
                 <div className="mb-2">
                   <TripConditionsBadge
@@ -202,11 +245,11 @@ export default function DispatchPage() {
 
                 <div>
                   <div className="text-sm text-slate-400 mb-1">Pickup</div>
-                  <div className="text-sm bg-slate-800/50 p-2 rounded">{selectedTripData.pickup.address}</div>
+                  <div className="text-sm bg-slate-800/50 p-2 rounded">{selectedTripData.pickupAddress}</div>
                 </div>
                 <div>
                   <div className="text-sm text-slate-400 mb-1">Dropoff</div>
-                  <div className="text-sm bg-slate-800/50 p-2 rounded">{selectedTripData.dropoff.address}</div>
+                  <div className="text-sm bg-slate-800/50 p-2 rounded">{selectedTripData.dropoffAddress}</div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
@@ -242,9 +285,9 @@ export default function DispatchPage() {
                       )}
                     </div>
                     {driverSuggestions
-                      .find((ds) => ds.tripId === selectedTripData.id)
+                      .find((ds: any) => ds.tripId === selectedTripData.id)
                       ?.suggestions.slice(0, 3)
-                      .map((suggestion, idx) => {
+                      .map((suggestion: any, idx: number) => {
                         const driver = drivers.find((d) => d.id === suggestion.driverId);
                         return (
                           <div
@@ -276,7 +319,7 @@ export default function DispatchPage() {
                               {suggestion.distance} mi away • {driver?.zone} zone • {driver?.status}
                             </div>
                             <div className="flex flex-wrap gap-1">
-                              {suggestion.reasons.map((reason, i) => (
+                              {suggestion.reasons.map((reason: string, i: number) => (
                                 <span key={i} className="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded">
                                   {reason}
                                 </span>

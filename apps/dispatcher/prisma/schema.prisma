@@ -1,0 +1,255 @@
+// Prisma Schema for RouteCare NEMT System
+// This defines the complete database structure
+
+generator client {
+  provider = "prisma-client-js"
+  // output defaults to node_modules/.prisma/client
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================================================
+// CORE ENTITIES
+// ============================================================================
+
+model Driver {
+  id              String       @id @default(cuid())
+  name            String
+  initials        String
+  phone           String
+  status          DriverStatus @default(off_duty)
+  vehicleId       String?
+  vehicle         Vehicle?     @relation(fields: [vehicleId], references: [id])
+  certifications  String[]
+  zone            String
+  shiftStart      String       // HH:mm format
+  shiftEnd        String       // HH:mm format
+  tripsToday      Int          @default(0)
+  onTimeRate      Float        @default(0)
+  totalMiles      Float        @default(0)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  trips           Trip[]
+  gpsPings        GPSPing[]
+
+  @@map("drivers")
+}
+
+model Vehicle {
+  id                    String      @id @default(cuid())
+  name                  String
+  type                  VehicleType
+  licensePlate          String      @unique
+  capacity              Int
+  wheelchairAccessible  Boolean
+  mileage               Float
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  drivers               Driver[]
+  trips                 Trip[]
+
+  @@map("vehicles")
+}
+
+model Passenger {
+  id                  String           @id @default(cuid())
+  memberIdMasked      String
+  name                String
+  phone               String
+  dateOfBirth         DateTime
+  age                 Int
+  gender              Gender
+  weight              Float?
+  mobilityLevel       MobilityLevel
+  specialNeeds        String[]
+  preferredLanguage   String?
+  insuranceProvider   String
+  insuranceId         String
+  insuranceStatus     InsuranceStatus
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+
+  trips               Trip[]
+
+  @@map("passengers")
+}
+
+model Trip {
+  id                        String       @id @default(cuid())
+  type                      TripType
+  priority                  TripPriority @default(scheduled)
+  status                    TripStatus   @default(unassigned)
+
+  passengerId               String
+  passenger                 Passenger    @relation(fields: [passengerId], references: [id])
+
+  pickupAddress             String
+  pickupLat                 Float
+  pickupLng                 Float
+  pickupScheduledTime       DateTime?
+  pickupActualTime          DateTime?
+  pickupNotes               String?
+
+  dropoffAddress            String
+  dropoffLat                Float
+  dropoffLng                Float
+  dropoffScheduledTime      DateTime?
+  dropoffActualTime         DateTime?
+  dropoffNotes              String?
+
+  scheduledWindowStart      DateTime
+  scheduledWindowEnd        DateTime
+
+  driverId                  String?
+  driver                    Driver?      @relation(fields: [driverId], references: [id])
+
+  vehicleId                 String?
+  vehicle                   Vehicle?     @relation(fields: [vehicleId], references: [id])
+
+  estimatedMiles            Float
+  estimatedDuration         Int
+  lateRisk                  LateRisk     @default(low)
+  notes                     String?
+
+  createdAt                 DateTime     @default(now())
+  updatedAt                 DateTime     @updatedAt
+
+  events                    TripEvent[]
+  claim                     Claim?
+
+  @@map("trips")
+}
+
+model TripEvent {
+  id          String        @id @default(cuid())
+  tripId      String
+  trip        Trip          @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  type        TripEventType
+  timestamp   DateTime      @default(now())
+  locationLat Float?
+  locationLng Float?
+  notes       String?
+  createdBy   String
+
+  @@map("trip_events")
+}
+
+model GPSPing {
+  id          String   @id @default(cuid())
+  driverId    String
+  driver      Driver   @relation(fields: [driverId], references: [id])
+  lat         Float
+  lng         Float
+  heading     Float
+  speed       Float
+  timestamp   DateTime @default(now())
+
+  @@map("gps_pings")
+}
+
+model Claim {
+  id                String      @id @default(cuid())
+  tripId            String      @unique
+  trip              Trip        @relation(fields: [tripId], references: [id])
+  patientName       String
+  insuranceProvider String
+  insuranceId       String
+  totalCharge       Float
+  status            ClaimStatus @default(ready_to_bill)
+  submittedAt       DateTime?
+  processedAt       DateTime?
+  paidAt            DateTime?
+  rejectionReason   String?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  @@map("claims")
+}
+
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+enum DriverStatus {
+  available
+  on_trip
+  off_duty
+  break
+}
+
+enum VehicleType {
+  sedan
+  wheelchair_van
+  ambulette
+}
+
+enum Gender {
+  Male
+  Female
+  Other
+}
+
+enum MobilityLevel {
+  ambulatory
+  wheelchair
+  stretcher
+}
+
+enum InsuranceStatus {
+  Active
+  Inactive
+  Pending
+}
+
+enum TripType {
+  discharge
+  dialysis
+  appointment
+  recurring
+}
+
+enum TripPriority {
+  STAT
+  urgent
+  scheduled
+}
+
+enum TripStatus {
+  unassigned
+  assigned
+  en_route_pickup
+  arrived_pickup
+  on_trip
+  arrived_dropoff
+  completed
+  cancelled
+}
+
+enum LateRisk {
+  low
+  medium
+  high
+}
+
+enum TripEventType {
+  trip_created
+  trip_assigned
+  en_route_pickup
+  arrived_pickup
+  passenger_onboard
+  en_route_dropoff
+  arrived_dropoff
+  trip_completed
+  trip_cancelled
+}
+
+enum ClaimStatus {
+  ready_to_bill
+  approved
+  paid
+  rejected
+}

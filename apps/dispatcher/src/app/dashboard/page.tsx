@@ -1,17 +1,60 @@
 'use client';
 
-import { mockData } from '@/shared';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { api } from '@/lib/api-client';
 import {
   BillingStatsCard,
   ClaimsTable,
   RecentActivityCard,
+  AddDriverModal,
 } from '@/components';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
 export default function DashboardPage() {
-  const { kpis, claims, billingStats, trips, drivers, tripEvents } = mockData;
+  const [kpis, setKpis] = useState<any>({
+    tripsToday: 0,
+    dischargePendingStat: 0,
+    onTimeRateScheduled: 0,
+    activeDrivers: 0,
+    availableDrivers: 0,
+  });
+  const [trips, setTrips] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showAddDriverModal, setShowAddDriverModal] = useState(false);
+
+  // Load data from API
+  const loadData = async () => {
+    try {
+      const [kpisData, tripsData] = await Promise.all([
+        api.dashboard.getKpis(),
+        api.trips.getAll(),
+      ]);
+      setKpis(kpisData.kpis);
+      setTrips(tripsData.trips);
+    } catch (error) {
+      console.error('Failed to load data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  // Use mock data for claims, billingStats, drivers, and tripEvents (not yet implemented in API)
+  const claims: any[] = [];
+  const billingStats = {
+    totalProcessed: 0,
+    totalPaid: 0,
+    averageClaimValue: 0,
+    rejectionRate: 0,
+    pendingClaims: 0,
+  };
+  const drivers: any[] = [];
+  const tripEvents: any[] = [];
 
   const statCards = [
     { label: 'Trips Today', value: kpis.tripsToday, icon: '🚗', color: 'from-blue-500 to-cyan-500' },
@@ -26,13 +69,24 @@ export default function DashboardPage() {
     .slice(0, 5)
     .map((trip) => ({
       id: trip.id,
-      title: `${trip.passenger.name} - ${trip.type === 'discharge' ? 'Discharge' : 'Scheduled'}`,
-      subtitle: `${trip.pickup.address} → ${trip.dropoff.address}`,
+      title: `${trip.passenger?.name || 'Unknown'} - ${trip.type === 'discharge' ? 'Discharge' : 'Scheduled'}`,
+      subtitle: `${trip.pickupAddress || 'N/A'} → ${trip.dropoffAddress || 'N/A'}`,
       reason: trip.priority === 'STAT' ? 'STAT Priority' : 'Unassigned',
       urgent: trip.priority === 'STAT',
       action: 'Assign Driver',
       tripId: trip.id,
     }));
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white dark:bg-slate-950 transition-colors flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-4xl mb-4">⏳</div>
+          <p className="text-slate-600 dark:text-slate-400">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950 transition-colors">
@@ -178,9 +232,17 @@ export default function DashboardPage() {
               <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Fleet Status</h2>
               <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">Real-time driver activity and performance</p>
             </div>
-            <Link href="/dispatch" className="text-indigo-400 hover:text-indigo-300 text-sm font-medium">
-              View Full Map →
-            </Link>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setShowAddDriverModal(true)}
+                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-colors text-sm"
+              >
+                + Add Driver
+              </button>
+              <Link href="/dispatch" className="text-indigo-400 hover:text-indigo-300 text-sm font-medium">
+                View Full Map →
+              </Link>
+            </div>
           </div>
 
           {/* Desktop Table View */}
@@ -309,6 +371,16 @@ export default function DashboardPage() {
           </div>
         </motion.div>
       </div>
+
+      {/* Add Driver Modal */}
+      <AddDriverModal
+        isOpen={showAddDriverModal}
+        onClose={() => setShowAddDriverModal(false)}
+        onSuccess={() => {
+          // Reload data after successfully adding a driver
+          loadData();
+        }}
+      />
     </div>
   );
 }

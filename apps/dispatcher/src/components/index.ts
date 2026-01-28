@@ -4,3 +4,5 @@ export { ClaimsTable } from './ClaimsTable';
 export { ProvidersCard } from './ProvidersCard';
 export { TripConditionsBadge } from './TripConditionsBadge';
 export { RecentActivityCard } from './RecentActivityCard';
+export { Modal } from './Modal';
+export { AddDriverModal } from './AddDriverModal';

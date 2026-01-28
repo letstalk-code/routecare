@@ -7,6 +7,8 @@ import { mockData } from '@/shared';
 
 export default function HomePage() {
   const [mounted, setMounted] = useState(false);
+  const [driverAppUrl, setDriverAppUrl] = useState('http://localhost:3009');
+
   const { scrollY } = useScroll();
   const y1 = useTransform(scrollY, [0, 300], [0, -50]);
   const y2 = useTransform(scrollY, [0, 300], [0, -100]);
@@ -14,14 +16,14 @@ export default function HomePage() {
 
   useEffect(() => {
     setMounted(true);
+    // Set driver app URL based on environment (only runs on client)
+    const url = window.location.hostname === 'localhost'
+      ? 'http://localhost:3009'
+      : 'https://routecare-driver.vercel.app';
+    setDriverAppUrl(url);
   }, []);
 
   const { tripsToday, activeDrivers, onTimeRateScheduled } = mockData.kpis;
-
-  // Driver app URL based on environment
-  const driverAppUrl = typeof window !== 'undefined' && window.location.hostname === 'localhost'
-    ? 'http://localhost:3009'
-    : 'https://routecare-driver.vercel.app';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 text-white overflow-x-hidden">
