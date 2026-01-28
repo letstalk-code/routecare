@@ -10,6 +10,7 @@ import {
   RecentActivityCard,
   AddDriverModal,
   AddVehicleModal,
+  AddPassengerModal,
 } from '@/components';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
@@ -25,6 +26,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [showAddDriverModal, setShowAddDriverModal] = useState(false);
   const [showAddVehicleModal, setShowAddVehicleModal] = useState(false);
+  const [showAddPassengerModal, setShowAddPassengerModal] = useState(false);
 
   // Load data from API
   const loadData = async () => {
@@ -102,6 +104,12 @@ export default function DashboardPage() {
             <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">Fleet management & billing overview</p>
           </div>
           <div className="flex items-center gap-3">
+            <Link
+              href="/settings"
+              className="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg font-medium hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors"
+            >
+              ⚙️ Settings
+            </Link>
             <ThemeToggle />
             <Link
               href="/dispatch"
@@ -114,6 +122,31 @@ export default function DashboardPage() {
       </header>
 
       <div className="p-6 space-y-6">
+        {/* Quick Actions */}
+        <div className="glass-panel rounded-xl p-4">
+          <div className="flex items-center gap-3 flex-wrap">
+            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Quick Actions:</span>
+            <button
+              onClick={() => setShowAddPassengerModal(true)}
+              className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors text-sm"
+            >
+              + Add Passenger
+            </button>
+            <button
+              onClick={() => setShowAddVehicleModal(true)}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors text-sm"
+            >
+              + Add Vehicle
+            </button>
+            <button
+              onClick={() => setShowAddDriverModal(true)}
+              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-colors text-sm"
+            >
+              + Add Driver
+            </button>
+          </div>
+        </div>
+
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {statCards.map((stat, index) => (
@@ -234,23 +267,9 @@ export default function DashboardPage() {
               <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Fleet Status</h2>
               <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">Real-time driver activity and performance</p>
             </div>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setShowAddVehicleModal(true)}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors text-sm"
-              >
-                + Add Vehicle
-              </button>
-              <button
-                onClick={() => setShowAddDriverModal(true)}
-                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-colors text-sm"
-              >
-                + Add Driver
-              </button>
-              <Link href="/dispatch" className="text-indigo-400 hover:text-indigo-300 text-sm font-medium">
-                View Full Map →
-              </Link>
-            </div>
+            <Link href="/dispatch" className="text-indigo-400 hover:text-indigo-300 text-sm font-medium">
+              View Full Map →
+            </Link>
           </div>
 
           {/* Desktop Table View */}
@@ -393,6 +412,15 @@ export default function DashboardPage() {
       <AddVehicleModal
         isOpen={showAddVehicleModal}
         onClose={() => setShowAddVehicleModal(false)}
+        onSuccess={() => {
+          loadData();
+        }}
+      />
+
+      {/* Add Passenger Modal */}
+      <AddPassengerModal
+        isOpen={showAddPassengerModal}
+        onClose={() => setShowAddPassengerModal(false)}
         onSuccess={() => {
           loadData();
         }}
