@@ -194,7 +194,7 @@ export default function DashboardPage() {
               </thead>
               <tbody>
                 {drivers.map((driver, index) => {
-                  const currentTrip = trips.find(t => t.assignedDriver === driver.id && t.status === 'on_trip');
+                  const currentTrip = trips.find(t => t.driverId === driver.id && t.status === 'on_trip');
                   return (
                     <motion.tr
                       key={driver.id}
