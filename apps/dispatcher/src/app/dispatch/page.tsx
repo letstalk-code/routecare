@@ -44,7 +44,7 @@ export default function DispatchPage() {
 
       <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 p-4 lg:p-6 lg:h-[calc(100vh-200px)]">
         {/* Dispatch Queue - Shows first on mobile, side on desktop */}
-        <div className="w-full lg:w-96 glass-panel rounded-lg p-4 lg:p-6 flex flex-col max-h-[600px] lg:max-h-none">
+        <div className="w-full lg:w-[450px] glass-panel rounded-lg p-4 lg:p-6 flex flex-col max-h-[600px] lg:max-h-none">
           <h2 className="text-lg font-semibold mb-4">Dispatch Queue</h2>
 
           {/* Tabs */}
