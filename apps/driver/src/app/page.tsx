@@ -4,6 +4,7 @@ import { mockData, Trip, TripEvent } from '@/shared';
 import { useState } from 'react';
 import { TripRequirementsCard } from '@/components/TripRequirementsCard';
 import { PatientCard } from '@/components/PatientCard';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export default function DriverPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -50,13 +51,13 @@ export default function DriverPage() {
 
   if (selectedTab === 'active' && currentTrip) {
     return (
-      <div className="min-h-screen bg-slate-950 text-white flex flex-col">
+      <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-white flex flex-col transition-colors">
         {/* Header */}
-        <header className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-sm p-4">
+        <header className="border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/50 backdrop-blur-sm p-4">
           <div className="flex items-center justify-between">
             <button onClick={() => setSelectedTab('upcoming')} className="text-2xl">←</button>
             <h1 className="font-semibold">Active Trip</h1>
-            <div className="w-8" />
+            <ThemeToggle />
           </div>
         </header>
 
@@ -139,16 +140,19 @@ export default function DriverPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex flex-col">
+    <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-white flex flex-col transition-colors">
       {/* Header */}
-      <header className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-sm p-4">
+      <header className="border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/50 backdrop-blur-sm p-4">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h1 className="text-xl font-bold">{driver.name}</h1>
-            <div className="text-sm text-slate-400">{driver.phone}</div>
+            <div className="text-sm text-slate-600 dark:text-slate-400">{driver.phone}</div>
           </div>
-          <div className="w-12 h-12 bg-indigo-600 rounded-full flex items-center justify-center font-bold">
-            {driver.initials}
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-indigo-600 rounded-full flex items-center justify-center font-bold text-white">
+              {driver.initials}
+            </div>
+            <ThemeToggle />
           </div>
         </div>
 

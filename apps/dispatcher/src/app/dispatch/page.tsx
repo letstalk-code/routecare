@@ -9,6 +9,7 @@ import {
   ProvidersCard,
   TripConditionsBadge,
 } from '@/components';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export default function DispatchPage() {
   const [selectedTab, setSelectedTab] = useState<'needs_action' | 'discharge' | 'scheduled' | 'all'>('needs_action');
@@ -39,11 +40,12 @@ export default function DispatchPage() {
   const selectedTripData = trips.find((t) => t.id === selectedTrip);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
+    <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-white transition-colors">
       {/* Header */}
-      <header className="border-b border-purple-900/30 bg-slate-900/50 backdrop-blur-sm">
-        <div className="px-4 lg:px-6 py-4">
+      <header className="border-b border-slate-200 dark:border-purple-900/30 bg-white/80 dark:bg-slate-900/50 backdrop-blur-sm">
+        <div className="px-4 lg:px-6 py-4 flex items-center justify-between">
           <h1 className="text-xl lg:text-2xl font-bold">RouteCare — Dispatch & Fleet Tracking</h1>
+          <ThemeToggle />
         </div>
       </header>
 
