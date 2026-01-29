@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { api } from '@/lib/api-client';
+import { useSSE } from '@/lib/use-sse';
 import {
   BillingStatsCard,
   ClaimsTable,
@@ -31,7 +32,20 @@ export default function DashboardPage() {
   const [showAssignDriverModal, setShowAssignDriverModal] = useState(false);
   const [selectedTripId, setSelectedTripId] = useState<string>('');
 
-  // Load data from API
+  // Real-time updates via SSE
+  const { connected, lastUpdate } = useSSE({
+    url: '/api/sse/dispatch',
+    onMessage: (message) => {
+      if (message.type === 'update' && message.data) {
+        setTrips(message.data.trips || []);
+        setKpis(message.data.kpis || kpis);
+        setLoading(false);
+      }
+    },
+    enabled: true,
+  });
+
+  // Load data from API (fallback for initial load)
   const loadData = async () => {
     try {
       const [kpisData, tripsData] = await Promise.all([
@@ -48,8 +62,11 @@ export default function DashboardPage() {
   };
 
   useEffect(() => {
-    loadData();
-  }, []);
+    // Only load manually if SSE is not connected
+    if (!connected) {
+      loadData();
+    }
+  }, [connected]);
 
   // Use mock data for claims, billingStats, drivers, and tripEvents (not yet implemented in API)
   const claims: any[] = [];
@@ -100,11 +117,20 @@ export default function DashboardPage() {
       {/* Header */}
       <header className="border-b border-slate-200 dark:border-purple-900/30 bg-white/80 dark:bg-slate-900/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="px-6 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-              RouteCare Dashboard
-            </h1>
-            <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">Fleet management & billing overview</p>
+          <div className="flex items-center gap-4">
+            <div>
+              <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+                RouteCare Dashboard
+              </h1>
+              <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">Fleet management & billing overview</p>
+            </div>
+            {/* Real-time connection indicator */}
+            <div className="flex items-center gap-2">
+              <div className={`w-2 h-2 rounded-full ${connected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
+              <span className="text-xs text-slate-500 dark:text-slate-400 hidden sm:inline">
+                {connected ? 'Live' : 'Disconnected'}
+              </span>
+            </div>
           </div>
           <div className="flex items-center gap-3">
             <Link

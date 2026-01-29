@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api-client';
+import { useSSE } from '@/lib/use-sse';
 import {
   PatientInfoCard,
   BillingStatsCard,
@@ -28,7 +29,21 @@ export default function DispatchPage() {
   const [loading, setLoading] = useState(true);
   const [showAddTripModal, setShowAddTripModal] = useState(false);
 
-  // Load data from API
+  // Real-time updates via SSE
+  const { connected, lastUpdate } = useSSE({
+    url: '/api/sse/dispatch',
+    onMessage: (message) => {
+      if (message.type === 'update' && message.data) {
+        setTrips(message.data.trips || []);
+        setDrivers(message.data.drivers || []);
+        setKpis(message.data.kpis || kpis);
+        setLoading(false);
+      }
+    },
+    enabled: true,
+  });
+
+  // Load data from API (fallback for initial load)
   const loadData = async () => {
     try {
       const [tripsData, driversData, kpisData] = await Promise.all([
@@ -47,8 +62,11 @@ export default function DispatchPage() {
   };
 
   useEffect(() => {
-    loadData();
-  }, []);
+    // Only load manually if SSE is not connected
+    if (!connected) {
+      loadData();
+    }
+  }, [connected]);
 
   // Use mock data for driver suggestions (not yet implemented in API)
   const driverSuggestions: any[] = [];
@@ -102,6 +120,13 @@ export default function DispatchPage() {
               </svg>
             </Link>
             <h1 className="text-xl lg:text-2xl font-bold">RouteCare — Dispatch & Fleet Tracking</h1>
+            {/* Real-time connection indicator */}
+            <div className="flex items-center gap-2 ml-4">
+              <div className={`w-2 h-2 rounded-full ${connected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
+              <span className="text-xs text-slate-500 dark:text-slate-400 hidden sm:inline">
+                {connected ? 'Live' : 'Disconnected'}
+              </span>
+            </div>
           </div>
           <div className="flex items-center gap-3">
             <button
