@@ -10,4 +10,4 @@ export { AddVehicleModal } from './AddVehicleModal';
 export { AddTripModal } from './AddTripModal';
 export { AddPassengerModal } from './AddPassengerModal';
 export { AssignDriverModal } from './AssignDriverModal';
-export { FleetMap } from './FleetMap';
+export { FleetMapWrapper as FleetMap } from './FleetMapWrapper';

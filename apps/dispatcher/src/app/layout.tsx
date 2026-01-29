@@ -25,6 +25,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
+      <head>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+      </head>
     <html lang="en">
       <body suppressHydrationWarning>
         <ThemeProvider>{children}</ThemeProvider>

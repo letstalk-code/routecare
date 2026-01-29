@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from 'react';
 import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
 
 // Fix Leaflet default icon issue with Next.js
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -26,7 +25,7 @@ interface FleetMapProps {
   selectedTripDropoff?: { lat: number; lng: number; address: string };
 }
 
-export function FleetMap({ drivers, selectedTripPickup, selectedTripDropoff }: FleetMapProps) {
+export function FleetMapClient({ drivers, selectedTripPickup, selectedTripDropoff }: FleetMapProps) {
   const mapRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.Marker[]>([]);
 
