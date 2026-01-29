@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api-client';
-import { useSSE } from '@/lib/use-sse';
 import {
   PatientInfoCard,
   BillingStatsCard,
@@ -29,20 +28,8 @@ export default function DispatchPage() {
   });
   const [loading, setLoading] = useState(true);
   const [showAddTripModal, setShowAddTripModal] = useState(false);
-  const [sseEnabled, setSseEnabled] = useState(false);
 
-  // Real-time updates via SSE (only after initial load)
-  const { connected, lastUpdate } = useSSE({
-    url: '/api/sse/dispatch',
-    onMessage: (message) => {
-      if (message.type === 'update' && message.data) {
-        setTrips(message.data.trips || []);
-        setDrivers(message.data.drivers || []);
-        setKpis(message.data.kpis || kpis);
-      }
-    },
-    enabled: sseEnabled,
-  });
+  // SSE disabled to save Vercel quota - using simple polling instead
 
   // Load data from API (fallback for initial load)
   const loadData = async () => {
@@ -63,10 +50,15 @@ export default function DispatchPage() {
   };
 
   useEffect(() => {
-    // Load initial data via API, then enable SSE
-    loadData().then(() => {
-      setSseEnabled(true);
-    });
+    // Load initial data
+    loadData();
+
+    // Poll for updates every 30 seconds to save Vercel quota
+    const interval = setInterval(() => {
+      loadData();
+    }, 30000);
+
+    return () => clearInterval(interval);
   }, []);
 
   // Use mock data for driver suggestions (not yet implemented in API)
