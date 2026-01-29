@@ -16,83 +16,80 @@ export async function GET(request: NextRequest) {
       // Function to send updates
       const sendUpdate = async () => {
         try {
-          // Fetch latest trips and drivers
-          const [trips, drivers, kpis] = await Promise.all([
+          const today = new Date()
+          today.setHours(0, 0, 0, 0)
+
+          // Fetch latest trips and drivers with optimized queries
+          const [trips, drivers, tripsToday, dischargePending, activeDrivers, availableDrivers] = await Promise.all([
             prisma.trip.findMany({
+              where: {
+                OR: [
+                  { status: { in: ['unassigned', 'assigned', 'on_trip'] } },
+                  { createdAt: { gte: today } },
+                ],
+              },
               include: {
-                passenger: true,
-                driver: true,
-                vehicle: true,
+                passenger: {
+                  select: {
+                    id: true,
+                    name: true,
+                    memberIdMasked: true,
+                    mobilityLevel: true,
+                    specialNeeds: true,
+                  },
+                },
+                driver: {
+                  select: {
+                    id: true,
+                    name: true,
+                    initials: true,
+                  },
+                },
               },
               orderBy: { createdAt: 'desc' },
-              take: 100, // Limit to recent trips
+              take: 50,
             }),
             prisma.driver.findMany({
-              include: {
-                vehicle: true,
+              select: {
+                id: true,
+                name: true,
+                initials: true,
+                status: true,
+                gpsPings: true,
+                tripsToday: true,
+                onTimeRate: true,
               },
               orderBy: { name: 'asc' },
             }),
-            // Calculate KPIs
-            Promise.resolve().then(async () => {
-              const today = new Date()
-              today.setHours(0, 0, 0, 0)
-
-              const [
-                tripsToday,
-                dischargePending,
-                scheduledTrips,
-                activeDrivers,
-                availableDrivers,
-              ] = await Promise.all([
-                prisma.trip.count({
-                  where: { createdAt: { gte: today } },
-                }),
-                prisma.trip.count({
-                  where: {
-                    type: 'discharge',
-                    status: { in: ['unassigned', 'assigned'] },
-                  },
-                }),
-                prisma.trip.findMany({
-                  where: {
-                    priority: 'scheduled',
-                    status: 'completed',
-                    dropoffActualTime: { not: null },
-                  },
-                  select: {
-                    scheduledWindowStart: true,
-                    dropoffActualTime: true,
-                  },
-                }),
-                prisma.driver.count({
-                  where: { status: { in: ['available', 'on_trip'] } },
-                }),
-                prisma.driver.count({
-                  where: { status: 'available' },
-                }),
-              ])
-
-              // Calculate on-time rate
-              const onTimeTrips = scheduledTrips.filter(
-                (trip) =>
-                  trip.dropoffActualTime &&
-                  trip.dropoffActualTime <= trip.scheduledWindowStart
-              )
-              const onTimeRate =
-                scheduledTrips.length > 0
-                  ? (onTimeTrips.length / scheduledTrips.length) * 100
-                  : 0
-
-              return {
-                tripsToday,
-                dischargePendingStat: dischargePending,
-                onTimeRateScheduled: Math.round(onTimeRate),
-                activeDrivers,
-                availableDrivers,
-              }
+            prisma.trip.count({
+              where: { createdAt: { gte: today } },
+            }),
+            prisma.trip.count({
+              where: {
+                type: 'discharge',
+                status: { in: ['unassigned', 'assigned'] },
+              },
+            }),
+            prisma.driver.count({
+              where: { status: { in: ['available', 'on_trip'] } },
+            }),
+            prisma.driver.count({
+              where: { status: 'available' },
             }),
           ])
+
+          // Use pre-calculated on-time rate from driver stats
+          const avgOnTimeRate = drivers.length > 0
+            ? Math.round(drivers.reduce((sum, d) => sum + d.onTimeRate, 0) / drivers.length)
+            : 0
+
+          const kpis = {
+            tripsToday,
+            dischargePendingStat: dischargePending,
+            onTimeRateScheduled: avgOnTimeRate,
+            activeDrivers,
+            availableDrivers,
+          }
 
           // Send update event
           const updateData = {

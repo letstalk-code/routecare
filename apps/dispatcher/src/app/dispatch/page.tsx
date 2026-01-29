@@ -13,9 +13,7 @@ import {
   TripConditionsBadge,
   AddTripModal,
 } from '@/components';
-import { FleetMap } from '@/components/FleetMap';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { FleetMap } from '@/components/FleetMap';
 
 export default function DispatchPage() {
   const [selectedTab, setSelectedTab] = useState<'needs_action' | 'discharge' | 'scheduled' | 'all'>('needs_action');

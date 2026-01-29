@@ -35,6 +35,7 @@ model Driver {
   trips           Trip[]
   gpsPings        GPSPing[]
 
+  @@index([status])
   @@map("drivers")
 }
 
@@ -121,6 +122,11 @@ model Trip {
   events                    TripEvent[]
   claim                     Claim?
 
+  @@index([status])
+  @@index([type])
+  @@index([createdAt])
+  @@index([status, type])
+  @@index([priority])
   @@map("trips")
 }
 
