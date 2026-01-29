@@ -255,28 +255,26 @@ export default function DispatchPage() {
             ))}
           </div>
         </div>
-
-          <FleetMap drivers={drivers} selectedTripPickup={selectedTripData ? { lat: selectedTripData.pickupLat, lng: selectedTripData.pickupLng, address: selectedTripData.pickupAddress } : undefined} selectedTripDropoff={selectedTripData ? { lat: selectedTripData.dropoffLat, lng: selectedTripData.dropoffLng, address: selectedTripData.dropoffAddress } : undefined} />
-          <FleetMap drivers={drivers} selectedTripPickup={selectedTripData ? { lat: selectedTripData.pickupLat, lng: selectedTripData.pickupLng, address: selectedTripData.pickupAddress } : undefined} selectedTripDropoff={selectedTripData ? { lat: selectedTripData.dropoffLat, lng: selectedTripData.dropoffLng, address: selectedTripData.dropoffAddress } : undefined} />
-          <FleetMap drivers={drivers} selectedTripPickup={selectedTripData ? { lat: selectedTripData.pickupLat, lng: selectedTripData.pickupLng, address: selectedTripData.pickupAddress } : undefined} selectedTripDropoff={selectedTripData ? { lat: selectedTripData.dropoffLat, lng: selectedTripData.dropoffLng, address: selectedTripData.dropoffAddress } : undefined} />
-          <FleetMap drivers={drivers} selectedTripPickup={selectedTripData ? { lat: selectedTripData.pickupLat, lng: selectedTripData.pickupLng, address: selectedTripData.pickupAddress } : undefined} selectedTripDropoff={selectedTripData ? { lat: selectedTripData.dropoffLat, lng: selectedTripData.dropoffLng, address: selectedTripData.dropoffAddress } : undefined} />
-          <FleetMap drivers={drivers} selectedTripPickup={selectedTripData ? { lat: selectedTripData.pickupLat, lng: selectedTripData.pickupLng, address: selectedTripData.pickupAddress } : undefined} selectedTripDropoff={selectedTripData ? { lat: selectedTripData.dropoffLat, lng: selectedTripData.dropoffLng, address: selectedTripData.dropoffAddress } : undefined} />
-          <FleetMap drivers={drivers} selectedTripPickup={selectedTripData ? { lat: selectedTripData.pickupLat, lng: selectedTripData.pickupLng, address: selectedTripData.pickupAddress } : undefined} selectedTripDropoff={selectedTripData ? { lat: selectedTripData.dropoffLat, lng: selectedTripData.dropoffLng, address: selectedTripData.dropoffAddress } : undefined} />
-          <FleetMap drivers={drivers} selectedTripPickup={selectedTripData ? { lat: selectedTripData.pickupLat, lng: selectedTripData.pickupLng, address: selectedTripData.pickupAddress } : undefined} selectedTripDropoff={selectedTripData ? { lat: selectedTripData.dropoffLat, lng: selectedTripData.dropoffLng, address: selectedTripData.dropoffAddress } : undefined} />
-          <FleetMap drivers={drivers} selectedTripPickup={selectedTripData ? { lat: selectedTripData.pickupLat, lng: selectedTripData.pickupLng, address: selectedTripData.pickupAddress } : undefined} selectedTripDropoff={selectedTripData ? { lat: selectedTripData.dropoffLat, lng: selectedTripData.dropoffLng, address: selectedTripData.dropoffAddress } : undefined} />
-          <FleetMap drivers={drivers} selectedTripPickup={selectedTripData ? { lat: selectedTripData.pickupLat, lng: selectedTripData.pickupLng, address: selectedTripData.pickupAddress } : undefined} selectedTripDropoff={selectedTripData ? { lat: selectedTripData.dropoffLat, lng: selectedTripData.dropoffLng, address: selectedTripData.dropoffAddress } : undefined} />
-          <FleetMap drivers={drivers} selectedTripPickup={selectedTripData ? { lat: selectedTripData.pickupLat, lng: selectedTripData.pickupLng, address: selectedTripData.pickupAddress } : undefined} selectedTripDropoff={selectedTripData ? { lat: selectedTripData.dropoffLat, lng: selectedTripData.dropoffLng, address: selectedTripData.dropoffAddress } : undefined} />
-          <FleetMap drivers={drivers} selectedTripPickup={selectedTripData ? { lat: selectedTripData.pickupLat, lng: selectedTripData.pickupLng, address: selectedTripData.pickupAddress } : undefined} selectedTripDropoff={selectedTripData ? { lat: selectedTripData.dropoffLat, lng: selectedTripData.dropoffLng, address: selectedTripData.dropoffAddress } : undefined} />
-          <FleetMap drivers={drivers} selectedTripPickup={selectedTripData ? { lat: selectedTripData.pickupLat, lng: selectedTripData.pickupLng, address: selectedTripData.pickupAddress } : undefined} selectedTripDropoff={selectedTripData ? { lat: selectedTripData.dropoffLat, lng: selectedTripData.dropoffLng, address: selectedTripData.dropoffAddress } : undefined} />
-          <FleetMap drivers={drivers} selectedTripPickup={selectedTripData ? { lat: selectedTripData.pickupLat, lng: selectedTripData.pickupLng, address: selectedTripData.pickupAddress } : undefined} selectedTripDropoff={selectedTripData ? { lat: selectedTripData.dropoffLat, lng: selectedTripData.dropoffLng, address: selectedTripData.dropoffAddress } : undefined} />
-                    }`} />
-                    <span className="text-sm">{driver.initials} - {driver.status}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+        {/* Map Panel - Shows second on mobile, first on desktop */}
+        <div className={`flex-1 glass-panel rounded-lg p-4 lg:p-6 min-h-[400px] lg:min-h-0 ${selectedTripData ? 'hidden lg:flex' : ''} flex flex-col`}>
+          <h2 className="text-lg font-semibold mb-4">Fleet Map</h2>
+          <div className="relative w-full flex-1">
+            <FleetMap
+              drivers={drivers}
+              selectedTripPickup={selectedTripData ? {
+                lat: selectedTripData.pickupLat,
+                lng: selectedTripData.pickupLng,
+                address: selectedTripData.pickupAddress
+              } : undefined}
+              selectedTripDropoff={selectedTripData ? {
+                lat: selectedTripData.dropoffLat,
+                lng: selectedTripData.dropoffLng,
+                address: selectedTripData.dropoffAddress
+              } : undefined}
+            />
           </div>
         </div>
+      </div>
 
         {/* Trip Detail Panel - Full screen on mobile, sidebar on desktop */}
         {selectedTripData && (
