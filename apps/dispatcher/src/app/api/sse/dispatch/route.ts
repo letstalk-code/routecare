@@ -113,8 +113,8 @@ export async function GET(request: NextRequest) {
       // Send initial data immediately
       await sendUpdate()
 
-      // Set up interval to send updates every 5 seconds
-      const interval = setInterval(sendUpdate, 5000)
+      // Set up interval to send updates every 10 seconds
+      const interval = setInterval(sendUpdate, 10000)
 
       // Clean up on connection close
       request.signal.addEventListener('abort', () => {

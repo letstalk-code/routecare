@@ -29,8 +29,9 @@ export default function DispatchPage() {
   });
   const [loading, setLoading] = useState(true);
   const [showAddTripModal, setShowAddTripModal] = useState(false);
+  const [sseEnabled, setSseEnabled] = useState(false);
 
-  // Real-time updates via SSE
+  // Real-time updates via SSE (only after initial load)
   const { connected, lastUpdate } = useSSE({
     url: '/api/sse/dispatch',
     onMessage: (message) => {
@@ -38,10 +39,9 @@ export default function DispatchPage() {
         setTrips(message.data.trips || []);
         setDrivers(message.data.drivers || []);
         setKpis(message.data.kpis || kpis);
-        setLoading(false);
       }
     },
-    enabled: true,
+    enabled: sseEnabled,
   });
 
   // Load data from API (fallback for initial load)
@@ -63,11 +63,11 @@ export default function DispatchPage() {
   };
 
   useEffect(() => {
-    // Only load manually if SSE is not connected
-    if (!connected) {
-      loadData();
-    }
-  }, [connected]);
+    // Load initial data via API, then enable SSE
+    loadData().then(() => {
+      setSseEnabled(true);
+    });
+  }, []);
 
   // Use mock data for driver suggestions (not yet implemented in API)
   const driverSuggestions: any[] = [];
