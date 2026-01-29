@@ -141,6 +141,36 @@ export default function SettingsPage() {
             </div>
           </div>
         </motion.div>
+
+        {/* Logout Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="glass-panel rounded-xl p-6 bg-red-50/50 dark:bg-red-900/20 border border-red-200 dark:border-red-800"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-semibold text-slate-900 dark:text-white mb-1">Account</h3>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                End your session and return to the login page
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                if (confirm('Are you sure you want to logout?')) {
+                  // Clear any stored data
+                  localStorage.clear();
+                  // Redirect to home page
+                  window.location.href = '/';
+                }
+              }}
+              className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors"
+            >
+              Logout
+            </button>
+          </div>
+        </motion.div>
       </div>
     </div>
   );

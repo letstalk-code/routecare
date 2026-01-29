@@ -88,6 +88,15 @@ export const api = {
     },
 
     /**
+     * Unassign driver from a trip
+     */
+    unassign: async (id: string) => {
+      return apiCall(`/api/trips/${id}/unassign`, {
+        method: 'POST',
+      })
+    },
+
+    /**
      * Get all events for a trip
      */
     getEvents: async (id: string) => {

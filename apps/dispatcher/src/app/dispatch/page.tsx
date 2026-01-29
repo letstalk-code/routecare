@@ -192,16 +192,36 @@ export default function DispatchPage() {
                     compact
                   />
                 </div>
-                <div className="mt-2 flex items-center gap-2">
-                  <span className={`px-2 py-0.5 text-xs rounded ${
-                    trip.status === 'unassigned' ? 'bg-yellow-500/20 text-yellow-400' :
-                    trip.status === 'on_trip' ? 'bg-blue-500/20 text-blue-400' :
-                    trip.status === 'completed' ? 'bg-green-500/20 text-green-400' :
-                    'bg-slate-600/20 text-slate-400'
-                  }`}>
-                    {trip.status}
-                  </span>
-                  <span className="text-xs text-slate-400">{trip.estimatedMiles} mi</span>
+                <div className="mt-2 flex items-center gap-2 justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className={`px-2 py-0.5 text-xs rounded ${
+                      trip.status === 'unassigned' ? 'bg-yellow-500/20 text-yellow-400' :
+                      trip.status === 'on_trip' ? 'bg-blue-500/20 text-blue-400' :
+                      trip.status === 'completed' ? 'bg-green-500/20 text-green-400' :
+                      'bg-slate-600/20 text-slate-400'
+                    }`}>
+                      {trip.status}
+                    </span>
+                    <span className="text-xs text-slate-400">{trip.estimatedMiles} mi</span>
+                  </div>
+                  {trip.driverId && (
+                    <button
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        if (confirm('Unassign driver from this trip?')) {
+                          try {
+                            await api.trips.unassign(trip.id);
+                            await loadData();
+                          } catch (error) {
+                            alert('Failed to unassign driver.');
+                          }
+                        }
+                      }}
+                      className="px-2 py-1 bg-amber-600/80 hover:bg-amber-600 text-white text-xs rounded transition-colors"
+                    >
+                      Unassign
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
@@ -243,6 +263,44 @@ export default function DispatchPage() {
                   ✕
                 </button>
               </div>
+
+              {/* Trip Actions */}
+              <div className="flex gap-2 mb-4">
+                {selectedTripData.driverId && (
+                  <button
+                    onClick={async () => {
+                      if (confirm('Unassign driver from this trip?')) {
+                        try {
+                          await api.trips.unassign(selectedTripData.id);
+                          await loadData();
+                        } catch (error) {
+                          alert('Failed to unassign driver. Please try again.');
+                        }
+                      }
+                    }}
+                    className="flex-1 px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm rounded-lg font-medium transition-colors"
+                  >
+                    Unassign Driver
+                  </button>
+                )}
+                <button
+                  onClick={async () => {
+                    if (confirm('Delete this trip? This action cannot be undone.')) {
+                      try {
+                        await api.trips.delete(selectedTripData.id);
+                        setSelectedTrip(null);
+                        await loadData();
+                      } catch (error) {
+                        alert('Failed to delete trip. Please try again.');
+                      }
+                    }
+                  }}
+                  className="flex-1 px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg font-medium transition-colors"
+                >
+                  Delete Trip
+                </button>
+              </div>
+
               <div className="space-y-4">
                 <div>
                   <div className="text-sm text-slate-400 mb-2">Trip ID</div>
