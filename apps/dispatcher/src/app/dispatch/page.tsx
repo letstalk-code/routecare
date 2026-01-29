@@ -113,13 +113,6 @@ export default function DispatchPage() {
               </svg>
             </Link>
             <h1 className="text-xl lg:text-2xl font-bold">RouteCare — Dispatch & Fleet Tracking</h1>
-            {/* Real-time connection indicator */}
-            <div className="flex items-center gap-2 ml-4">
-              <div className={`w-2 h-2 rounded-full ${connected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
-              <span className="text-xs text-slate-500 dark:text-slate-400 hidden sm:inline">
-                {connected ? 'Live' : 'Disconnected'}
-              </span>
-            </div>
           </div>
           <div className="flex items-center gap-3">
             <button

@@ -12,6 +12,7 @@ import {
   AddDriverModal,
   AddVehicleModal,
   AddPassengerModal,
+  AddClaimModal,
   AssignDriverModal,
 } from '@/components';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -30,6 +31,7 @@ export default function DashboardPage() {
   const [showAddVehicleModal, setShowAddVehicleModal] = useState(false);
   const [showAddPassengerModal, setShowAddPassengerModal] = useState(false);
   const [showAssignDriverModal, setShowAssignDriverModal] = useState(false);
+  const [showAddClaimModal, setShowAddClaimModal] = useState(false);
   const [selectedTripId, setSelectedTripId] = useState<string>('');
 
   // Real-time updates via SSE
@@ -289,7 +291,7 @@ export default function DashboardPage() {
 
           {/* Middle/Right Column - Claims Table */}
           <div className="lg:col-span-2">
-            <ClaimsTable claims={claims} />
+            <ClaimsTable claims={claims} onAddClaim={() => setShowAddClaimModal(true)} />
           </div>
         </div>
 
@@ -459,6 +461,15 @@ export default function DashboardPage() {
       <AddPassengerModal
         isOpen={showAddPassengerModal}
         onClose={() => setShowAddPassengerModal(false)}
+        onSuccess={() => {
+          loadData();
+        }}
+      />
+
+      {/* Add Claim Modal */}
+      <AddClaimModal
+        isOpen={showAddClaimModal}
+        onClose={() => setShowAddClaimModal(false)}
         onSuccess={() => {
           loadData();
         }}

@@ -6,9 +6,10 @@ import { motion } from 'framer-motion';
 interface ClaimsTableProps {
   claims: Claim[];
   title?: string;
+  onAddClaim?: () => void;
 }
 
-export function ClaimsTable({ claims, title = 'Recent Claims' }: ClaimsTableProps) {
+export function ClaimsTable({ claims, title = 'Recent Claims', onAddClaim }: ClaimsTableProps) {
   const getStatusBadge = (status: Claim['status']) => {
     const styles = {
       ready_to_bill: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
@@ -48,9 +49,22 @@ export function ClaimsTable({ claims, title = 'Recent Claims' }: ClaimsTableProp
     >
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-lg font-semibold text-white">{title}</h3>
-        <button className="px-3 py-1.5 text-sm font-medium text-indigo-400 hover:text-indigo-300 hover:bg-indigo-500/10 rounded-lg transition-colors">
-          Export CSV
-        </button>
+        <div className="flex items-center gap-2">
+          {onAddClaim && (
+            <button
+              onClick={onAddClaim}
+              className="px-3 py-1.5 text-sm font-medium bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors flex items-center gap-1.5"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Add Claim
+            </button>
+          )}
+          <button className="px-3 py-1.5 text-sm font-medium text-indigo-400 hover:text-indigo-300 hover:bg-indigo-500/10 rounded-lg transition-colors">
+            Export CSV
+          </button>
+        </div>
       </div>
 
       <div className="overflow-x-auto">

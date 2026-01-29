@@ -9,5 +9,6 @@ export { AddDriverModal } from './AddDriverModal';
 export { AddVehicleModal } from './AddVehicleModal';
 export { AddTripModal } from './AddTripModal';
 export { AddPassengerModal } from './AddPassengerModal';
+export { AddClaimModal } from './AddClaimModal';
 export { AssignDriverModal } from './AssignDriverModal';
 export { FleetMapWrapper as FleetMap } from './FleetMapWrapper';

@@ -25,8 +25,8 @@ export async function createAuditLog({
         entityType,
         entityId,
         userName,
-        changes: changes || null,
-        metadata: metadata || null,
+        changes: changes || undefined,
+        metadata: metadata || undefined,
       },
     })
   } catch (error) {
