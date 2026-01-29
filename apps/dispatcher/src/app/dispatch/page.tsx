@@ -272,7 +272,6 @@ export default function DispatchPage() {
             />
           </div>
         </div>
-      </div>
 
         {/* Trip Detail Panel - Full screen on mobile, sidebar on desktop */}
         {selectedTripData && (
