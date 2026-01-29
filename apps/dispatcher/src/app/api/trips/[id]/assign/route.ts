@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { createAuditLog } from '@/lib/audit'
 
 // POST /api/trips/[id]/assign - Assign driver to trip
 export async function POST(
@@ -63,6 +64,14 @@ export async function POST(
     await prisma.driver.update({
       where: { id: body.driverId },
       data: { status: 'on_trip' },
+    })
+
+    // Audit log
+    await createAuditLog({
+      action: 'trip_assigned',
+      entityType: 'trip',
+      entityId: id,
+      metadata: { driverId: body.driverId, driverName: driver.name },
     })
 
     return NextResponse.json({ trip })

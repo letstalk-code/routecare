@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { createAuditLog } from '@/lib/audit'
 
 // GET /api/trips - Get all trips with optional filters
 export async function GET(request: NextRequest) {
@@ -110,6 +111,14 @@ export async function POST(request: NextRequest) {
         type: 'trip_created',
         createdBy: 'system',
       },
+    })
+
+    // Audit log
+    await createAuditLog({
+      action: 'trip_created',
+      entityType: 'trip',
+      entityId: trip.id,
+      metadata: { passengerId: trip.passengerId, priority: trip.priority },
     })
 
     return NextResponse.json({ trip }, { status: 201 })

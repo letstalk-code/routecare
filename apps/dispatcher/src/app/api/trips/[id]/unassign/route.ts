@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { createAuditLog } from '@/lib/audit'
 
 // POST /api/trips/[id]/unassign - Unassign driver from trip
 export async function POST(
@@ -60,6 +61,14 @@ export async function POST(
         data: { status: 'available' },
       })
     }
+
+    // Audit log
+    await createAuditLog({
+      action: 'trip_unassigned',
+      entityType: 'trip',
+      entityId: id,
+      metadata: { previousDriverId: driverId, previousDriverName: currentTrip.driver?.name },
+    })
 
     return NextResponse.json({ trip })
   } catch (error) {

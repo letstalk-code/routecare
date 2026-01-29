@@ -253,3 +253,40 @@ enum ClaimStatus {
   paid
   rejected
 }
+
+// ============================================================================
+// AUDIT LOG
+// ============================================================================
+
+model AuditLog {
+  id          String      @id @default(cuid())
+  action      AuditAction
+  entityType  String      // "trip", "driver", "passenger", etc.
+  entityId    String
+  userName    String      @default("system") // "system" or "dispatcher" until auth
+  changes     Json?       // Before/after values
+  metadata    Json?       // Additional context
+  createdAt   DateTime    @default(now())
+
+  @@index([entityType, entityId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+enum AuditAction {
+  trip_created
+  trip_updated
+  trip_deleted
+  trip_assigned
+  trip_unassigned
+  driver_created
+  driver_updated
+  driver_status_changed
+  passenger_created
+  passenger_updated
+  vehicle_created
+  vehicle_updated
+  claim_created
+  claim_updated
+}
