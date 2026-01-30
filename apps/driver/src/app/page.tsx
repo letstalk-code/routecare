@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { TripRequirementsCard } from '@/components/TripRequirementsCard';
 import { PatientCard } from '@/components/PatientCard';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { openMapsNavigation } from '@/lib/maps';
 
 export default function DriverPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -77,20 +78,34 @@ export default function DriverPage() {
             </div>
 
             <div className="space-y-3">
-              <div className="flex gap-3">
+              <button
+                onClick={() => openMapsNavigation(currentTrip.pickup.address, currentTrip.pickup.lat, currentTrip.pickup.lng)}
+                className="flex gap-3 w-full text-left hover:bg-indigo-500/10 p-2 -m-2 rounded-lg transition-colors active:bg-indigo-500/20"
+              >
                 <div className="text-2xl">📍</div>
-                <div>
+                <div className="flex-1">
                   <div className="text-xs text-slate-400 mb-1">Pickup</div>
-                  <div className="text-sm">{currentTrip.pickup.address}</div>
+                  <div className="text-sm text-indigo-400 underline decoration-dotted">{currentTrip.pickup.address}</div>
+                  <div className="text-xs text-slate-500 mt-0.5">Tap to open in Maps</div>
                 </div>
-              </div>
-              <div className="flex gap-3">
+                <svg className="w-5 h-5 text-slate-400 flex-shrink-0 self-center" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+              <button
+                onClick={() => openMapsNavigation(currentTrip.dropoff.address, currentTrip.dropoff.lat, currentTrip.dropoff.lng)}
+                className="flex gap-3 w-full text-left hover:bg-indigo-500/10 p-2 -m-2 rounded-lg transition-colors active:bg-indigo-500/20"
+              >
                 <div className="text-2xl">🏥</div>
-                <div>
+                <div className="flex-1">
                   <div className="text-xs text-slate-400 mb-1">Dropoff</div>
-                  <div className="text-sm">{currentTrip.dropoff.address}</div>
+                  <div className="text-sm text-indigo-400 underline decoration-dotted">{currentTrip.dropoff.address}</div>
+                  <div className="text-xs text-slate-500 mt-0.5">Tap to open in Maps</div>
                 </div>
-              </div>
+                <svg className="w-5 h-5 text-slate-400 flex-shrink-0 self-center" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
             </div>
           </div>
 
@@ -275,14 +290,32 @@ function TripCard({ trip }: { trip: Trip }) {
         </span>
       </div>
       <div className="space-y-2 text-sm">
-        <div className="flex gap-2">
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            openMapsNavigation(trip.pickup.address, trip.pickup.lat, trip.pickup.lng);
+          }}
+          className="flex gap-2 items-center w-full text-left hover:text-indigo-400 transition-colors"
+        >
           <span>📍</span>
-          <span className="text-slate-300 truncate">{trip.pickup.address}</span>
-        </div>
-        <div className="flex gap-2">
+          <span className="text-slate-300 dark:text-slate-400 truncate flex-1">{trip.pickup.address}</span>
+          <svg className="w-4 h-4 text-slate-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            openMapsNavigation(trip.dropoff.address, trip.dropoff.lat, trip.dropoff.lng);
+          }}
+          className="flex gap-2 items-center w-full text-left hover:text-indigo-400 transition-colors"
+        >
           <span>🏥</span>
-          <span className="text-slate-300 truncate">{trip.dropoff.address}</span>
-        </div>
+          <span className="text-slate-300 dark:text-slate-400 truncate flex-1">{trip.dropoff.address}</span>
+          <svg className="w-4 h-4 text-slate-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
       </div>
     </div>
   );
