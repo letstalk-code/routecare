@@ -10,6 +10,7 @@ import { openMapsNavigation } from '@/lib/maps';
 export default function DriverPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [selectedTab, setSelectedTab] = useState<'upcoming' | 'active' | 'completed'>('active');
+  const [driverStatus, setDriverStatus] = useState<'available' | 'on_break'>('available');
 
   const driver = mockData.drivers[0]; // Default to Carlos Martinez (drv_001)
   const myTrips = mockData.trips.filter((t) => t.driverId === driver.id);
@@ -55,10 +56,31 @@ export default function DriverPage() {
       <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-white flex flex-col transition-colors">
         {/* Header */}
         <header className="border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/50 backdrop-blur-sm p-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-3">
             <button onClick={() => setSelectedTab('upcoming')} className="text-2xl">←</button>
             <h1 className="font-semibold">Active Trip</h1>
-            <ThemeToggle />
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setIsLoggedIn(false)}
+                className="text-sm text-slate-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+              >
+                Logout
+              </button>
+              <ThemeToggle />
+            </div>
+          </div>
+          {/* Status Badge */}
+          <div className="flex items-center gap-2">
+            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium ${
+              driverStatus === 'available'
+                ? 'bg-green-500/10 text-green-600 dark:text-green-400'
+                : 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+            }`}>
+              <div className={`w-2 h-2 rounded-full ${
+                driverStatus === 'available' ? 'bg-green-500' : 'bg-amber-500'
+              } animate-pulse`} />
+              <span>{driverStatus === 'available' ? 'Available' : 'On Break'}</span>
+            </div>
           </div>
         </header>
 
@@ -164,6 +186,12 @@ export default function DriverPage() {
             <div className="text-sm text-slate-600 dark:text-slate-400">{driver.phone}</div>
           </div>
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsLoggedIn(false)}
+              className="text-sm text-slate-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+            >
+              Logout
+            </button>
             <div className="w-12 h-12 bg-indigo-600 rounded-full flex items-center justify-center font-bold text-white">
               {driver.initials}
             </div>
@@ -172,14 +200,36 @@ export default function DriverPage() {
         </div>
 
         {/* Status Toggle */}
-        <div className="flex gap-2">
-          <button className="flex-1 py-2 bg-green-600 rounded-lg text-sm font-medium">
+        <div className="flex gap-2 mb-2">
+          <button
+            onClick={() => setDriverStatus('available')}
+            className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
+              driverStatus === 'available'
+                ? 'bg-green-600 text-white'
+                : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+            }`}
+          >
             Available
           </button>
-          <button className="flex-1 py-2 bg-slate-800 text-slate-400 rounded-lg text-sm font-medium">
+          <button
+            onClick={() => setDriverStatus('on_break')}
+            className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
+              driverStatus === 'on_break'
+                ? 'bg-amber-600 text-white'
+                : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+            }`}
+          >
             On Break
           </button>
         </div>
+
+        {/* Status Indicator */}
+        {driverStatus === 'on_break' && (
+          <div className="flex items-center gap-2 text-xs text-amber-600 dark:text-amber-400 bg-amber-500/10 px-3 py-2 rounded-lg">
+            <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse" />
+            <span>You are currently on break - no trips will be assigned</span>
+          </div>
+        )}
       </header>
 
       {/* Stats */}

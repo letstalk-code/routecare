@@ -1,14 +1,17 @@
 /**
  * Opens the default maps app with navigation to the given address or coordinates
- * - iOS: Opens Apple Maps
- * - Android/Desktop: Opens Google Maps
+ * - iOS (iPhone/iPad): Opens Apple Maps
+ * - macOS (desktop): Opens Apple Maps
+ * - Android/Windows/Linux: Opens Google Maps
  */
 export function openMapsNavigation(address: string, lat?: number, lng?: number) {
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  const isMac = /Macintosh|Mac OS X/.test(navigator.userAgent);
+  const useAppleMaps = isIOS || isMac;
 
   if (lat && lng) {
     // Use coordinates if available (more accurate)
-    if (isIOS) {
+    if (useAppleMaps) {
       // Apple Maps with coordinates
       window.open(`maps://maps.apple.com/?daddr=${lat},${lng}&dirflg=d`, '_blank');
     } else {
@@ -18,7 +21,7 @@ export function openMapsNavigation(address: string, lat?: number, lng?: number) 
   } else {
     // Use address as fallback
     const encodedAddress = encodeURIComponent(address);
-    if (isIOS) {
+    if (useAppleMaps) {
       // Apple Maps with address
       window.open(`maps://maps.apple.com/?daddr=${encodedAddress}&dirflg=d`, '_blank');
     } else {
